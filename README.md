@@ -1,20 +1,40 @@
-# PyTorch NIMA: Neural IMage Assessment
+# PyTorch NIMA v1
+Originally published by truskovskiyk (https://github.com/truskovskiyk/nima.pytorch). 
+
+Modifications will save your time to run this on Google Colab / Kaggle Code. Run with Python 3.6.
 
 PyTorch implementation of [Neural IMage Assessment](https://arxiv.org/abs/1709.05424) by Hossein Talebi and Peyman Milanfar. You can learn more from [this post at Google Research Blog](https://research.googleblog.com/2017/12/introducing-nima-neural-image-assessment.html). 
 
 
-## Installing
+## Installing on Google Colab / Kaggle
+
+Check out [Google Colab setup](https://colab.research.google.com/gist/stiven-ding/b39d9673985030dc9acb668648b4a50b/nima-v1.ipynb?authuser=2).
 
 ```bash
-git clone https://github.com/truskovskiyk/nima.pytorch.git 
-cd nima.pytorch
-virtualenv -p python3.6 env
-source ./env/bin/activate
-pip install -r requirements/linux_gpu.txt
+# Install PIP
+!curl https://bootstrap.pypa.io/get-pip.py -o get-pip3.6.py
+!python3.6 get-pip3.6.py
+
+# Install NIMA
+!git clone https://github.com/stiven-ding/nima.pytorch.git
+%cd nima.pytorch
+!python3.6 -m pip install -r requirements.txt
+!python3.6 setup.py install
 ```
 
-or You can just use ready [Dockerfile](./Dockerfile)
+## Pretrained model  
 
+To test with the pretrained model, run
+```bash
+!curl -O https://s3-us-west-1.amazonaws.com/models-nima/pretrain-model.pth 
+!python3.6 nima/cli.py get-image-score --path_to_model_weight ./pretrain-model.pth --path_to_image test_image.jpg
+```
+
+You can use this [pretrain-model](https://s3-us-west-1.amazonaws.com/models-nima/pretrain-model.pth) with
+```bash
+val_emd_loss = 0.079
+test_emd_loss = 0.080
+```
 
 ## Dataset
 
@@ -26,22 +46,6 @@ Here are some examples of images with theire scores
 ## Model 
 
 Used MobileNetV2 architecture as described in the paper [Inverted Residuals and Linear Bottlenecks: Mobile Networks for Classification, Detection and Segmentation](https://arxiv.org/pdf/1801.04381).
-
-## Pre-train model  
-
-You can use this [pretrain-model](https://s3-us-west-1.amazonaws.com/models-nima/pretrain-model.pth) with
-```bash
-val_emd_loss = 0.079
-test_emd_loss = 0.080
-```
-## Deployment
-
-Deployed model on [heroku](https://www.heroku.com/) URL is https://neural-image-assessment.herokuapp.com/ You can use it for testing in Your own images, but pay attention, that's free service, so it cannot handel too many requests. Here is simple curl command to test deployment models
-```bash
-curl  -X POST -F "file=@123.jpg" https://neural-image-assessment.herokuapp.com/api/get_scores
-```
-Please use our [swagger](https://neural-image-assessment.herokuapp.com/apidocs) for interactive testing 
-
 
 ## Usage
 ```bash
@@ -57,7 +61,7 @@ export EXPERIMENT_DIR_NAME=/storage/experiment_n0001
 ```
 Clean and prepare dataset
 ```bash
-python nima/cli.py prepare_dataset --path_to_ava_txt $PATH_TO_AVA_TXT \
+python3.6 nima/cli.py prepare-dataset --path_to_ava_txt $PATH_TO_AVA_TXT \
                                     --path_to_save_csv $PATH_TO_CSV \
                                     --path_to_images $PATH_TO_IMAGES
 
@@ -65,7 +69,7 @@ python nima/cli.py prepare_dataset --path_to_ava_txt $PATH_TO_AVA_TXT \
 
 Train model
 ```bash
-python nima/cli.py train_model --path_to_save_csv $PATH_TO_CSV \
+python3.6 nima/cli.py train-model --path_to_save_csv $PATH_TO_CSV \
                                 --path_to_images $PATH_TO_IMAGES \
                                 --batch_size $BATCH_SIZE \
                                 --num_workers $NUM_WORKERS \
@@ -82,7 +86,7 @@ tensorboard --logdir .
 ```
 Validate model on val and test datasets
 ```bash
-python nima/cli.py validate_model --path_to_model_weight ./pretrain-model.pth \
+python3.6 nima/cli.py validate-model --path_to_model_weight ./pretrain-model.pth \
                                     --path_to_save_csv $PATH_TO_CSV \
                                     --path_to_images $PATH_TO_IMAGES \
                                     --batch_size $BATCH_SIZE \
@@ -90,13 +94,8 @@ python nima/cli.py validate_model --path_to_model_weight ./pretrain-model.pth \
 ```
 Get scores for one image
 ```bash
-python nima/cli.py get_image_score --path_to_model_weight ./pretrain-model.pth --path_to_image test_image.jpg
+python3.6 nima/cli.py get-image-score --path_to_model_weight ./pretrain-model.pth --path_to_image test_image.jpg
 ```
-   
-## Contributing
-
-Contributing are welcome
-
 
 ## License
 
